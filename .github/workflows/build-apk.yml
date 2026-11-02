@@ -30,8 +30,22 @@ jobs:
         working-directory: src_build
         run: gradle assembleDebug --no-daemon --stacktrace
 
-      - name: Rename APK
-        run: cp src_build/app/build/outputs/apk/debug/app-debug.apk ShifokorAI.apk
+      - name: Sign with release key (so it installs over the previous version)
+        env:
+          SIGN_KEY_B64: ${{ secrets.SIGN_KEY_B64 }}
+          SIGN_CERT_B64: ${{ secrets.SIGN_CERT_B64 }}
+        run: |
+          cp src_build/app/build/outputs/apk/debug/app-debug.apk ShifokorAI-debug.apk
+          if [ -n "$SIGN_KEY_B64" ] && [ -n "$SIGN_CERT_B64" ]; then
+            pip install cryptography
+            echo "$SIGN_KEY_B64" | base64 -d > key.pem
+            echo "$SIGN_CERT_B64" | base64 -d > cert.der
+            python3 src_build/sign_apk.py ShifokorAI-debug.apk ShifokorAI.apk key.pem cert.der
+            rm -f key.pem cert.der ShifokorAI-debug.apk
+          else
+            echo "::warning::SIGN_KEY_B64 / SIGN_CERT_B64 secrets yo'q: APK debug kaliti bilan imzolandi, eski versiya ustiga o'rnatilmaydi"
+            mv ShifokorAI-debug.apk ShifokorAI.apk
+          fi
 
       - uses: actions/upload-artifact@v4
         with:
