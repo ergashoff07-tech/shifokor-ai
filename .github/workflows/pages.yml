@@ -24,9 +24,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Prepare site
         run: |
-          mkdir -p site src_demo
-          unzip -q shifokor-ai-src.zip -d src_demo
-          cp src_demo/app/src/main/assets/index.html site/index.html
+          mkdir -p site
+          cp demo/index.html site/index.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
