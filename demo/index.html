@@ -787,7 +787,8 @@ const store = {
   set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
 };
 const WEBKEY='shifokor_web_key';
-function webKey(){ try{ return localStorage.getItem(WEBKEY)||''; }catch(e){ return ''; } }
+const DEMO_KEY='__DEMO_KEY__';
+function webKey(){ let k=''; try{ k=localStorage.getItem(WEBKEY)||''; }catch(e){} return k||(DEMO_KEY.indexOf('__')===0?'':DEMO_KEY); }
 function hasKey(){ return IS_APP ? Android.hasKey() : !!webKey(); }
 
 /* ═══════ Navigation ═══════ */
